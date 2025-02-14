@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderHistory;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +42,19 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $menu = Menu::find($item['menu_id']);
-                $subtotal = $menu->harga * $item['jumlah'];
+                $harga = $menu->harga;
+
+                // Cek diskon yang berlaku
+                $diskon = $menu->discount()
+                    ->where('tanggal_mulai', '<=', now())
+                    ->where('tanggal_berakhir', '>=', now())
+                    ->first();
+
+                if ($diskon) {
+                    $harga -= ($harga * ($diskon->persentase_diskon / 100));
+                }
+
+                $subtotal = $harga * $item['jumlah'];
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -84,6 +97,29 @@ class OrderController extends Controller
     public function update(Request $request, string $id)
     {
         //
+    }
+
+
+    public function updateStatus(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|in:pending,diproses,selesai'
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        // Simpan ke riwayat pembelian
+        OrderHistory::create([
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'warung_id' => $order->warung_id,
+            'total_harga' => $order->total_harga,
+            'status' => $request->status,
+        ]);
+
+        return response()->json(['message' => 'Status updated and order history recorded']);
     }
 
     /**

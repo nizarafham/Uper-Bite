@@ -15,4 +15,10 @@ class Menu extends Model
     {
         return $this->belongsTo(Warung::class);
     }
+
+    public function discount()
+    {
+        return $this->hasOne(Discount::class);
+    }
+
 }

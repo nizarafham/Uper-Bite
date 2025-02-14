@@ -5,7 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WarungController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\DiscountController;
 
 
 Route::post('/register', [AuthController::class, 'register']); // Mahasiswa & Dosen daftar
@@ -25,5 +27,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/payment/{order_id}', [PaymentController::class, 'getSnapToken']);
     Route::post('/payment/callback', [PaymentController::class, 'paymentCallback']);
+
+    Route::get('/discounts', [DiscountController::class, 'index']);
+    Route::post('/discounts', [DiscountController::class, 'store']);
+
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+
+    Route::get('/order-histories', [OrderHistoryController::class, 'index']);
+    Route::get('/order-histories/{id}', [OrderHistoryController::class, 'show']);
 });
 
