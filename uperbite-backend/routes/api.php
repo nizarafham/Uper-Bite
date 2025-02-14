@@ -20,9 +20,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/warungs', [WarungController::class, 'store']);
 
     Route::get('/menus', [MenuController::class, 'index']);
+    Route::get('/warungs/{id}', [WarungController::class, 'show']);
     Route::post('/warungs/{warung_id}/menus', [MenuController::class, 'store']);
 
     Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store']);
 
     Route::get('/payment/{order_id}', [PaymentController::class, 'getSnapToken']);
