@@ -14,7 +14,24 @@ class WarungController extends Controller
      */
     public function index()
     {
-        return response()->json(Warung::with('penjual')->get());
+        $warungs = Warung::with('penjual', 'menus')->get();
+
+        return response()->json([
+            'warungs' => $warungs->map(function ($warung) {
+                return [
+                    'id' => $warung->id,
+                    'nama' => $warung->nama,
+                    'penjual' => $warung->penjual,
+                    'menus' => $warung->menus->map(function ($menu) {
+                        return [
+                            'id' => $menu->id,
+                            'nama' => $menu->nama,
+                            'kategori' => $menu->kategori, // Ambil nilai enum kategori
+                        ];
+                    }),
+                ];
+            }),
+        ]);
     }
 
     public function store(Request $request)
@@ -44,16 +61,17 @@ class WarungController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
-        $warung = Warung::with('menus')->find($id);
-
+    public function show($id) {
+        $warung = Warung::where('id', $id)->first();
         if (!$warung) {
             return response()->json(['message' => 'Warung tidak ditemukan'], 404);
         }
-
-        return response()->json($warung);
+        return response()->json([
+            'warung' => $warung,
+            'menus' => $warung->menus // Pastikan ini sesuai dengan relasi di model
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.

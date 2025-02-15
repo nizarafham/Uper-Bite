@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Warung;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -80,30 +81,46 @@ class AuthController extends Controller
 
     // **Login (Mahasiswa: NIM, Dosen: Nama, Penjual: Admin Buatkan Akun)**
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'identifier' => 'required|string',
-            'password' => 'required',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'identifier' => 'required|string',
+        'password' => 'required',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
-
-        $user = User::where('identifier', $request->identifier)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'NIM/Nama atau password salah'], 401);
-        }
-
-        if (!$user->email_verified) {
-            return response()->json(['error' => 'Silakan verifikasi email Anda terlebih dahulu'], 403);
-        }
-
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        return response()->json(['token' => $token, 'role' => $user->role], 200);
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
     }
+
+    $user = User::where('identifier', $request->identifier)->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['error' => 'NIM/Nama atau password salah'], 401);
+    }
+
+    if (!$user->email_verified) {
+        return response()->json(['error' => 'Silakan verifikasi email Anda terlebih dahulu'], 403);
+    }
+
+    // Buat token autentikasi
+    $token = $user->createToken('authToken')->plainTextToken;
+
+    // Data yang akan dikembalikan
+    $responseData = [
+        'token' => $token,
+        'role' => $user->role,
+    ];
+
+    // Hanya tambahkan warung_id dan nama_warung jika user adalah penjual
+    if ($user->role === 'penjual') {
+        $warung = Warung::where('penjual_id', $user->id)->first();
+        if ($warung) {
+            $responseData['warung_id'] = $warung->id;
+            $responseData['nama_warung'] = $warung->nama;
+        }
+    }
+
+    return response()->json($responseData, 200);
+}
 
     // **Logout**
     public function logout(Request $request)

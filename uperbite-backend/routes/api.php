@@ -18,9 +18,9 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/warungs', [WarungController::class, 'index']);
     Route::post('/warungs', [WarungController::class, 'store']);
+    Route::get('/warungs/{id}', [WarungController::class, 'show']);
 
     Route::get('/menus', [MenuController::class, 'index']);
-    Route::get('/warungs/{id}', [WarungController::class, 'show']);
     Route::post('/warungs/{warung_id}/menus', [MenuController::class, 'store']);
 
     Route::get('/orders', [OrderController::class, 'index']);

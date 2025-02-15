@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "115016602125",
+    "project_id": "uperbite-app",
+    "storage_bucket": "uperbite-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:115016602125:android:a3cbf2827878547ab9bb44",
+        "android_client_info": {
+          "package_name": "com.example.uperbite_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYC9zd7zI4UoXcCQ8SvE16JVJJj9VxnwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
